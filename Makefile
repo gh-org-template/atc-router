@@ -23,18 +23,18 @@ TARGET ?= x86_64-unknown-linux-gnu
 
 all: ;
 
-build: target/release/libatc_router.so target/release/libatc_router.a
+build: atc-router/target/release/libatc_router.so atc-router/target/release/libatc_router.a
 
-target/release/libatc_router.%: src/*.rs
-	$(CARGO) build --release --target $(TARGET)
+atc-router/target/release/libatc_router.%: atc-router/src/*.rs
+	cd atc-router && $(CARGO) build --release --target $(TARGET)
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/resty/router/
-	$(INSTALL) -m 664 lib/resty/router/*.lua $(DESTDIR)$(LUA_LIB_DIR)/resty/router/
-	$(INSTALL) -m 775 target/*/release/libatc_router.$(SHLIB_EXT) $(DESTDIR)$(LUA_LIB_DIR)/libatc_router.so
+	$(INSTALL) -m 664 atc-router/lib/resty/router/*.lua $(DESTDIR)$(LUA_LIB_DIR)/resty/router/
+	$(INSTALL) -m 775 atc-router/target/*/release/libatc_router.$(SHLIB_EXT) $(DESTDIR)$(LUA_LIB_DIR)/libatc_router.so
 
 clean:
-	rm -rf target
+	rm -rf atc-router/target
 
 clean/submodules:
 	-git submodule foreach --recursive git reset --hard

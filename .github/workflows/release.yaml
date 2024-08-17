@@ -1,7 +1,7 @@
 ---
 name: Release
 
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
   push:
     branches:
@@ -49,13 +49,13 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
           override: true
-      - uses: actions-rs/cargo@v1
+      - name: Build with Cargo
+        run: |
+          cd atc-router
+          cargo build --release --target ${{ matrix.target }}
         env:
           RUSTFLAGS: '-C target-feature=-crt-static' # Required for aarch64-unknown-linux-musl
-        with:
-          use-cross: true
-          command: build
-          args: --release --target ${{ matrix.target }}
+          CARGO_NET_GIT_FETCH_WITH_CLI: true
       - name: Install, Compress, and rename artifacts
         env:
           DESTDIR: ${{ env.DESTDIR }}
