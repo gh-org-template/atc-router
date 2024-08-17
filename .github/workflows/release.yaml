@@ -43,7 +43,19 @@ jobs:
           - aarch64-unknown-linux-musl
 
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Rsync atc-router files
+        run: |
+          rsync -av --ignore-existing atc-router/ .
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
