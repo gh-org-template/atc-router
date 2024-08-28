@@ -35,3 +35,8 @@ install:
 
 clean:
 	rm -rf target
+
+clean/submodules:
+	-git submodule foreach --recursive git reset --hard
+	-git submodule update --init --recursive
+	-git submodule status
