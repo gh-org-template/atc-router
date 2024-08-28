@@ -56,6 +56,12 @@ jobs:
       - name: Rsync atc-router files
         run: |
           rsync -av --ignore-existing atc-router/ .
+      - name: Get Tag from atc-router Directory
+        id: get-tag
+        run: |
+          cd atc-router
+          TAG=$(git describe --tags --exact-match 2>/dev/null || echo "no-tag")
+          echo "ROUTER_TAG=${TAG}" >> $GITHUB_ENV
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -80,6 +86,13 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.release-git-tag }}
           files: ${{ matrix.target }}.tar.gz
+      - name: Publish Artifacts as GitHub Packages
+        if: ${{ needs.release.outputs.published == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ROUTER_TAG }}
+          path: ${{ matrix.target }}.tar.gz
+        continue-on-error: true
 
   done:
     needs: [release, artifacts]
@@ -89,7 +102,7 @@ jobs:
     steps:
     - name: Check for Failed Jobs
       run: |
-        if [[ "${{ needs.release.result }}" == "failure" || "${{ needs.artifacts.result }}" == "failure" || "${{ needs.multi-arch.result }}" == "failure" ]]; then
+        if [[ "${{ needs.release.result }}" == "failure" || "${{ needs.artifacts.result }}" == "failure" ]]; then
           echo "One or more jobs failed. Marking release as failed."
           exit 1
         else
