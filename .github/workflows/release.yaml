@@ -88,7 +88,7 @@ jobs:
           files: ${{ matrix.target }}.tar.gz
       - name: Publish Artifacts as GitHub Packages
         if: ${{ needs.release.outputs.published == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.ROUTER_TAG }}
           path: ${{ matrix.target }}.tar.gz
